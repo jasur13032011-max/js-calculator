@@ -1,288 +1,245 @@
 # js-calculator
-1. HTML Fayl (index.html)
+Klaviaturani to'liq qo'llab-quvvatlaydigan, nolga bo'lish xatolarini to'g'ri boshqaradigan va mobil qurilmalarga moslashuvchan (responsive) mukammal Kalkulyator loyihasining to'liq HTML, CSS va JavaScript kodi:
+
+HTML va CSS Kodu
 HTML
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsiv Kalkulyator</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Kalkulyator</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Responisve kalkulyator konteyneri */
+    .calculator {
+      width: 100%;
+      max-width: 360px;
+      background-color: #1e293b;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Ekran (Display) uslubi */
+    .display {
+      width: 100%;
+      height: 70px;
+      background-color: #0f172a;
+      border: none;
+      border-radius: 8px;
+      color: #38bdf8;
+      font-size: 2rem;
+      text-align: right;
+      padding: 10px 15px;
+      margin-bottom: 20px;
+      outline: none;
+      overflow-x: auto;
+    }
+
+    /* Tugmalar tarmog'i (Grid) */
+    .buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    /* Umumiy tugma uslublari */
+    button {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 18px 0;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #334155;
+      color: #f8fafc;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* Maxsus tugmalar ranglari */
+    button.clear {
+      background-color: #ef4444; /* Qizil C tugmasi */
+      color: white;
+    }
+    button.clear:hover { background-color: #dc2626; }
+
+    button.operator {
+      background-color: #f97316; /* To'q sariq amallar */
+      color: white;
+    }
+    button.operator:hover { background-color: #ea580c; }
+
+    button.equal {
+      background-color: #10b981; /* Yashil tenglik */
+      color: white;
+      grid-column: span 2; /* Tenglik tugmasi 2 ta katakni egallaydi */
+    }
+    button.equal:hover { background-color: #059669; }
+
+    button.number:hover {
+      background-color: #475569;
+    }
+
+    /* Klaviatura fokusi uchun chiroyli outline */
+    button:focus-visible {
+      outline: 3px solid #38bdf8;
+      outline-offset: 2px;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="kalkulyator">
-        <div class="displey-konteyner">
-            <div id="tarix-ekran" class="tarix"></div>
-            <div id="asosiy-ekran" class="ekran">0</div>
-        </div>
+  <div class="calculator">
+    <input type="text" class="display" id="calc-display" readonly value="0">
 
-        <div class="tugmalar">
-            <button class="tugma funksiya" onclick="tozalash()">C</button>
-            <button class="tugma funksiya" onclick="operatorniTanlash('/')">/</button>
-            <button class="tugma funksiya" onclick="operatorniTanlash('*')">&times;</button>
-            <button class="tugma funksiya" onclick="ochirish()">&#9003;</button>
+    <div class="buttons-grid">
+      <button class="clear" onclick="clearDisplay()">C</button>
+      <button class="operator" onclick="appendOperator('/')">/</button>
+      <button class="operator" onclick="appendOperator('*')">*</button>
+      <button class="operator" onclick="appendOperator('-')">-</button>
+      
+      <button class="number" onclick="appendNumber('7')">7</button>
+      <button class="number" onclick="appendNumber('8')">8</button>
+      <button class="number" onclick="appendNumber('9')">9</button>
+      <button class="operator" onclick="appendOperator('+')">+</button>
 
-            <button class="tugma" onclick="raqamQoshish('7')">7</button>
-            <button class="tugma" onclick="raqamQoshish('8')">8</button>
-            <button class="tugma" onclick="raqamQoshish('9')">9</button>
-            <button class="tugma funksiya" onclick="operatorniTanlash('-')">-</button>
+      <button class="number" onclick="appendNumber('4')">4</button>
+      <button class="number" onclick="appendNumber('5')">5</button>
+      <button class="number" onclick="appendNumber('6')">6</button>
+      <button class="number" onclick="appendNumber('.')">.</button>
 
-            <button class="tugma" onclick="raqamQoshish('4')">4</button>
-            <button class="tugma" onclick="raqamQoshish('5')">5</button>
-            <button class="tugma" onclick="raqamQoshish('6')">6</button>
-            <button class="tugma funksiya" onclick="operatorniTanlash('+')">+</button>
-
-            <button class="tugma" onclick="raqamQoshish('1')">1</button>
-            <button class="tugma" onclick="raqamQoshish('2')">2</button>
-            <button class="tugma" onclick="raqamQoshish('3')">3</button>
-            <button class="tugma tenglik" onclick="hisoblash()">=</button>
-
-            <button class="tugma nol" onclick="raqamQoshish('0')">0</button>
-            <button class="tugma" onclick="nuqtaQoshish()">.</button>
-        </div>
+      <button class="number" onclick="appendNumber('1')">1</button>
+      <button class="number" onclick="appendNumber('2')">2</button>
+      <button class="number" onclick="appendNumber('3')">3</button>
+      
+      <button class="number" onclick="appendNumber('0')">0</button>
+      <button class="equal" onclick="calculateResult()">=</button>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <script>
+    const display = document.getElementById('calc-display');
+    let currentExpression = '';
+    let isErrorDisplaying = false;
+
+    // Raqam qo'shish
+    function appendNumber(num) {
+      if (isErrorDisplaying || display.value === '0') {
+        currentExpression = '';
+        isErrorDisplaying = false;
+      }
+      
+      // Ketma-ket nuqta qo'yilishini oldini olish
+      if (num === '.' && currentExpression.split(/[\+\-\*\/]/).pop().includes('.')) {
+        return;
+      }
+
+      currentExpression += num;
+      display.value = currentExpression;
+    }
+
+    // Operator qo'shish (+, -, *, /)
+    function appendOperator(op) {
+      if (isErrorDisplaying) return;
+      
+      if (currentExpression === '' && op !== '-') return;
+
+      // Agar oxirgi belgi operator bo'lsa, uni yangisiga almashtirish
+      const lastChar = currentExpression.slice(-1);
+      if (['+', '-', '*', '/'].includes(lastChar)) {
+        currentExpression = currentExpression.slice(0, -1) + op;
+      } else {
+        currentExpression += op;
+      }
+      
+      display.value = currentExpression;
+    }
+
+    // 'C' tugmasi - Ekranni tozalash
+    function clearDisplay() {
+      currentExpression = '';
+      display.value = '0';
+      isErrorDisplaying = false;
+    }
+
+    // Hisoblash amali
+    function calculateResult() {
+      if (currentExpression === '') return;
+
+      // Nolga bo'lish holatini aniqlash (/0 mantiqiy xatosi)
+      if (/\/0(?!\d)/.test(currentExpression)) {
+        display.value = "Xato: Nolga bo'lish!";
+        currentExpression = '';
+        isErrorDisplaying = true;
+        return;
+      }
+
+      try {
+        // eval o'rniga xavfsiz Function constructor orqali hisoblash
+        const result = new Function(`return ${currentExpression}`)();
+        
+        // Kasr sonlar to'g'ri ko'rinishi uchun (masalan 0.1 + 0.2)
+        display.value = Number(result.toFixed(8)).toString();
+        currentExpression = display.value;
+      } catch (error) {
+        display.value = "Xatolik";
+        currentExpression = '';
+        isErrorDisplaying = true;
+      }
+    }
+
+    // KLAVIATURA BILAN ISHLASH (Keydown event)
+    document.addEventListener('keydown', (event) => {
+      const key = event.key;
+
+      if (/[0-9.]/.test(key)) {
+        appendNumber(key);
+      } else if (['+', '-', '*', '/'].includes(key)) {
+        appendOperator(key);
+      } else if (key === 'Enter' || key === '=') {
+        event.preventDefault(); // Brauzer standart harakatini to'xtatish
+        calculateResult();
+      } else if (key === 'Escape' || key.toLowerCase() === 'c') {
+        clearDisplay();
+      } else if (key === 'Backspace') {
+        if (isErrorDisplaying) {
+          clearDisplay();
+        } else {
+          currentExpression = currentExpression.slice(0, -1);
+          display.value = currentExpression || '0';
+        }
+      }
+    });
+  </script>
 </body>
 </html>
-2. CSS Fayl (style.css)
-CSS
-/* Umumiy sozlamalar */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-}
+Kod qanday talablarni bajardi?
+To'liq amallar: Qo'shish, ayirish, ko'paytirish, bo'lish amallari JavaScript motori orqali aniq bajariladi.
 
-body {
-    background-color: #0f172a;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
+Nolga bo'lish xatosi: /\/0(?!\d)/ muntazam ifodasi (regex) orqali ifoda ichida /0 borligi tekshiriladi va darhol Xato: Nolga bo'lish! matni ekranga chiqariladi.
 
-/* Kalkulyator korpusi va Responsivlik */
-.kalkulyator {
-    background-color: #1e293b;
-    width: 100%;
-    max-width: 360px; /* Kompyuterda ixcham ko'rinadi */
-    border-radius: 24px;
-    padding: 24px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-}
+C tugmasi: clearDisplay() funksiyasi xotira va ekrandagi ma'lumotlarni tozalab, 0 holatiga qaytaradi.
 
-/* Displey stillari */
-.displey-konteyner {
-    background-color: #0f172a;
-    padding: 20px;
-    border-radius: 16px;
-    text-align: right;
-    margin-bottom: 20px;
-    min-height: 100px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    overflow: hidden;
-}
+Klaviatura boshqaruvi: keydown hodisasi yordamida raqamlar, operatorlar, Enter (tenglik), Escape/C (tozalash) hamda Backspace (bittalab o'chirish) tugmalari klaviaturadan to'g'ridan-to'g'ri ishlaydi.
 
-.tarix {
-    color: #64748b;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-    word-wrap: break-word;
-}
-
-.ekran {
-    color: #ffffff;
-    font-size: clamp(1.8rem, 8vw, 2.5rem); /* Ekran torayganda matn o'zi kichrayadi */
-    font-weight: 600;
-    word-wrap: break-word;
-}
-
-/* Grid yordamida tugmalarni joylashtirish */
-.tugmalar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-}
-
-.tugma {
-    background-color: #334155;
-    color: #ffffff;
-    border: none;
-    padding: 18px 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-    border-radius: 16px;
-    cursor: pointer;
-    transition: background-color 0.1s ease, transform 0.05s ease;
-}
-
-.tugma:active {
-    transform: scale(0.95);
-}
-
-/* Tugma turlari bo'yicha ranglar */
-.tugma:hover {
-    background-color: #475569;
-}
-
-.funksiya {
-    background-color: #f97316;
-}
-
-.funksiya:hover {
-    background-color: #ea580c;
-}
-
-.tenglik {
-    background-color: #2563eb;
-    grid-row: span 2; /* 2 ta qator joyni egallaydi */
-    height: 100%;
-}
-
-.tenglik:hover {
-    background-color: #1d4ed8;
-}
-
-.nol {
-    grid-column: span 2; /* 2 ta ustun joyni egallaydi */
-}
-3. JavaScript Fayl (script.js)
-JavaScript
-// Ekran elementlarini bog'lab olamiz
-const asosiyEkran = document.getElementById('asosiy-ekran');
-const tarixEkran = document.getElementById('tarix-ekran');
-
-let joriyQiymat = '0';
-let oldingiQiymat = '';
-let operator = null;
-let yangiRaqamKutilmoqda = false;
-
-// Ekranni yangilash funksiyasi
-function ekranniYangila() {
-    asosiyEkran.innerText = joriyQiymat;
-    if (operator && oldingiQiymat) {
-        tarixEkran.innerText = `${oldingiQiymat} ${operator}`;
-    } else {
-        tarixEkran.innerText = '';
-    }
-}
-
-// Raqam tugmalari bosilganda
-function raqamQoshish(raqam) {
-    if (joriyQiymat === '0' || yangiRaqamKutilmoqda || joriyQiymat === 'Xato') {
-        joriyQiymat = raqam;
-        yangiRaqamKutilmoqda = false;
-    } else {
-        // Displey sig'imidan oshib ketmasligi uchun cheklov (max 12 belgi)
-        if (joriyQiymat.length < 12) {
-            joriyQiymat += raqam;
-        }
-    }
-    ekranniYangila();
-}
-
-// Nuqta (vergul) tugmasi bosilganda
-function nuqtaQoshish() {
-    if (yangiRaqamKutilmoqda || joriyQiymat === 'Xato') {
-        joriyQiymat = '0.';
-        yangiRaqamKutilmoqda = false;
-    } else if (!joriyQiymat.includes('.')) {
-        joriyQiymat += '.';
-    }
-    ekranniYangila();
-}
-
-// Operatorlar (+, -, *, /) bosilganda
-function operatorniTanlash(tanlanganOperator) {
-    if (joriyQiymat === 'Xato') return;
-    
-    if (operator && !yangiRaqamKutilmoqda) {
-        hisoblash();
-    }
-    
-    oldingiQiymat = joriyQiymat;
-    operator = tanlanganOperator;
-    yangiRaqamKutilmoqda = true;
-    ekranniYangila();
-}
-
-// Matematik hisob-kitob qismi
-function hisoblash() {
-    if (!operator || yangiRaqamKutilmoqda) return;
-
-    const bering = parseFloat(oldingiQiymat);
-    const olgan = parseFloat(joriyQiymat);
-    let natija = 0;
-
-    switch (operator) {
-        case '+': natija = bering + olgan; break;
-        case '-': natija = bering - olgan; break;
-        case '*': natija = bering * olgan; break;
-        case '/':
-            // Nolga bo'lish holatini tekshirish
-            if (olgan === 0) {
-                joriyQiymat = 'Xato';
-                operator = null;
-                oldingiQiymat = '';
-                ekranniYangila();
-                return;
-            }
-            natija = bering / olgan;
-            break;
-        default: return;
-    }
-
-    // Natija juda uzun kasr bo'lsa, qisqartirish (max 4 ta kasr raqami)
-    joriyQiymat = parseFloat(natija.toFixed(4)).toString();
-    operator = null;
-    oldingiQiymat = '';
-    yangiRaqamKutilmoqda = true;
-    ekranniYangila();
-}
-
-// 'C' tugmasi - Ekranni tozalash
-function tozalash() {
-    joriyQiymat = '0';
-    oldingiQiymat = '';
-    operator = null;
-    yangiRaqamKutilmoqda = false;
-    ekranniYangila();
-}
-
-// Bitta belgini o'chirish (Backspace)
-function ochirish() {
-    if (joriyQiymat === 'Xato' || joriyQiymat.length === 1) {
-        joriyQiymat = '0';
-    } else {
-        joriyQiymat = joriyQiymat.slice(0, -1);
-    }
-    ekranniYangila();
-}
-
-// KLAVIATURA BILAN ISHLASH TIZIMI
-document.addEventListener('keydown', (event) => {
-    const kalit = event.key;
-
-    if (kalit >= '0' && kalit <= '9') raqamQoshish(kalit);
-    if (kalit === '.' || kalit === ',') nuqtaQoshish();
-    if (kalit === '+' || kalit === '-' || kalit === '*' || kalit === '/') operatorniTanlash(kalit);
-    if (kalit === 'Enter' || kalit === '=') hisoblash();
-    if (kalit === 'Escape' || kalit.toLowerCase() === 'c') tozalash();
-    if (kalit === 'Backspace') ochirish();
-});
-Talablar qanday bajarildi?
-Matematik amallar: +, -, *, / amallari JavaScript-dagi switch operatori orqali xatosiz hisoblanadi.
-
-Nolga bo'lish cheklovi: Bo'luvchi 0 bo'lgan holatda ekran displeyida silliqqina "Xato" xabari paydo bo'ladi.
-
-Tozalash ('C'): tozalash() funksiyasi barcha o'zgaruvchilarni dastlabki (nol) holatiga qaytaradi.
-
-Klaviatura integratsiyasi: keydown hodisasi yordamida kompyuter klaviaturasidagi raqamlar, Enter, Backspace va Escape (C vazifasini bajaradi) tugmalari kalkulyator bilan to'liq bog'langan.
-
-Responsiv dizayn: CSS-da max-width: 360px, grid va clamp() funksiyalari qo'llanilgani sababli, kalkulyator kichik mobil telefonlarda ham, katta ekranlarda ham mukammal joylashadi.
+Responsive dizayn: CSS Grid va max-width: 360px xossasi kalkulyatorni kompyuter, planshet va eng kichik mobil telefon ekranlarida ham shakli buzilmasdan, chiroyli joylashishini ta'minlaydi.
